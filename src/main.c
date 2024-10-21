@@ -42,7 +42,11 @@ unknownAcc:
         printf("\nEnter the account number:");
         getPrompt(&input);
         if (checkAccount(u, input, 0))
+        {
+            free(input);
             goto unknownAcc;
+        }
+        free(input);
         system("clear");
         success(u);
         goto unknownAcc;
@@ -53,8 +57,12 @@ unknownAcc:
         system("clear");
         printf("Enter the account number of the customer: ");
         getPrompt(&input);
-        if (transaction(u, input))
+        if (!transaction(u, input))
+        {
+            free(input);
             goto unknownAcc;
+        }
+        free(input);
         system("clear");
         printf("\n✔ Success!\n\n");
         success(u);

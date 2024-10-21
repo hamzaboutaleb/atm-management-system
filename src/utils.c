@@ -282,3 +282,21 @@ void freeRecord(struct Record *r)
     if (r->phone)
         free(r->phone);
 }
+
+bool isFixedAccount(int id)
+{
+    sqlite3_stmt *stmt;
+    char *query;
+    char *type;
+
+    query = "SELECT type_of_account FROM records WHERE account_id = ?";
+    dbQuery(db, query, &stmt);
+    dbBindInt(stmt, 1, id);
+    if (dbStep(stmt) == SQLITE_ROW)
+    {
+        type = getColumnText(stmt, 0);
+        if (!strcmp(type, "fixed01") || !strcmp(type, "fixed02") || !strcmp(type, "fixed03"))
+            return true;
+    }
+    return false;
+}
