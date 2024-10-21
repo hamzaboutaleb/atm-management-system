@@ -15,7 +15,7 @@ struct Date
     int month, day, year;
 };
 
-//database declaration
+// database declaration
 extern sqlite3 *db;
 
 // all fields for each record of an account
@@ -55,11 +55,11 @@ int checkAccount(struct User u, char *input, int op);
 int updateAccount(struct User u, char *input);
 int deleteAccount(struct User u, char *input);
 int transaction(struct User u, char *input);
-int transfer(struct User user, char * input);
+int transfer(struct User user, char *input);
 void mainMenu(struct User u);
 void success(struct User u);
 
-//database
+// database
 void createDatabase();
 void initDatabase();
 int dbOpen(sqlite3 **db, const char *filename);
@@ -71,11 +71,12 @@ int dbBindText(sqlite3_stmt *stmt, int index, const char *value);
 int dbBindDouble(sqlite3_stmt *stmt, int index, double value);
 int dbStep(sqlite3_stmt *stmt);
 int getColumnInt(sqlite3_stmt *stmt, int col);
-const char* getColumnText(sqlite3_stmt *stmt, int col);
+const char *getColumnText(sqlite3_stmt *stmt, int col);
 double getColumnDouble(sqlite3_stmt *stmt, int col);
 int isColumnNull(sqlite3_stmt *stmt, int col);
-
-//utils
+int dbFinalize(sqlite3_stmt *stmt);
+int userNameExist(char *username);
+// utils
 void getPrompt(char **str);
 char **split(char *str, char delim);
 void getDateFromStrs(char **str, struct Date *date);
@@ -89,4 +90,5 @@ int checkAmount(char *str);
 int checkExistingUser(char *user, int *user_id);
 int strIsInt(char *str);
 int validate_date(const char *date);
+void freeUser(struct User *u);
 #endif

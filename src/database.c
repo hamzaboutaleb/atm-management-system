@@ -1,6 +1,5 @@
 #include "header.h"
 
-
 sqlite3 *db = NULL;
 
 void createDatabase()
@@ -21,21 +20,21 @@ void initDatabase()
     char *errmsg = NULL;
     int rc;
 
-    user_sql =   "CREATE TABLE IF NOT EXISTS users ("
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                "name TEXT NOT NULL UNIQUE, "
-                "pass TEXT);";
+    user_sql = "CREATE TABLE IF NOT EXISTS users ("
+               "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+               "name TEXT NOT NULL UNIQUE, "
+               "pass TEXT);";
     record_sql = "CREATE TABLE IF NOT EXISTS records ("
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                "user_id INTEGER, "
-                "user_name TEXT, "
-                "account_id INTEGER UNIQUE, "
-                "date_of_creation TEXT, "
-                "country TEXT, "
-                "phone_number TEXT, "
-                "balance REAL, "
-                "type_of_account TEXT, "
-                "FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE);";
+                 "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                 "user_id INTEGER, "
+                 "user_name TEXT, "
+                 "account_id INTEGER UNIQUE, "
+                 "date_of_creation TEXT, "
+                 "country TEXT, "
+                 "phone_number TEXT, "
+                 "balance REAL, "
+                 "type_of_account TEXT, "
+                 "FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE);";
 
     rc = sqlite3_exec(db, user_sql, 0, 0, &errmsg);
     handleDbError(rc, db, errmsg);
@@ -49,8 +48,8 @@ void insertRecord(struct Record r, struct User u)
     int rc;
     sqlite3_stmt *stmt;
 
-    sql =   "INSERT INTO records (user_id, user_name, account_id, date_of_creation, country, phone_number, balance, type_of_account)"
-            "SELECT id, name, ?, ?, ?, ?, ?, ? FROM users WHERE name = ? LIMIT 1;";
+    sql = "INSERT INTO records (user_id, user_name, account_id, date_of_creation, country, phone_number, balance, type_of_account)"
+          "SELECT id, name, ?, ?, ?, ?, ?, ? FROM users WHERE name = ? LIMIT 1;";
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     handleDbError(rc, db, sqlite3_errmsg(db));
     rc = sqlite3_bind_int(stmt, 1, r.accountNbr);
@@ -73,94 +72,125 @@ void insertRecord(struct Record r, struct User u)
     sqlite3_finalize(stmt);
 }
 
-int dbOpen(sqlite3 **db, const char *filename) {
+int dbOpen(sqlite3 **db, const char *filename)
+{
     int rc = sqlite3_open(filename, db);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(*db));
         return rc;
     }
     return SQLITE_OK;
 }
 
-void dbClose(sqlite3 *db) {
-    if (db) {
+void dbClose(sqlite3 *db)
+{
+    if (db)
+    {
         sqlite3_close(db);
     }
 }
 
-int dbExecute(sqlite3 *db, const char *query) {
+int dbExecute(sqlite3 *db, const char *query)
+{
     char *errmsg;
     int rc = sqlite3_exec(db, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         fprintf(stderr, "SQL error: %s\n", errmsg);
         sqlite3_free(errmsg);
     }
     return rc;
 }
 
-int dbQuery(sqlite3 *db, const char *query, sqlite3_stmt **stmt) {
+int dbQuery(sqlite3 *db, const char *query, sqlite3_stmt **stmt)
+{
     int rc = sqlite3_prepare_v2(db, query, -1, stmt, NULL);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+        exit(1);
     }
     return rc;
 }
 
-int dbBindInt(sqlite3_stmt *stmt, int index, int value) {
+int dbBindInt(sqlite3_stmt *stmt, int index, int value)
+{
     int rc = sqlite3_bind_int(stmt, index, value);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         fprintf(stderr, "Failed to bind int: %s\n", sqlite3_errmsg(sqlite3_db_handle(stmt)));
+        exit(1);
     }
     return rc;
 }
 
-int dbBindText(sqlite3_stmt *stmt, int index, const char *value) {
+int dbBindText(sqlite3_stmt *stmt, int index, const char *value)
+{
     int rc = sqlite3_bind_text(stmt, index, value, -1, SQLITE_STATIC);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(sqlite3_db_handle(stmt)));
+        exit(1);
     }
     return rc;
 }
 
-int dbBindDouble(sqlite3_stmt *stmt, int index, double value) {
+int dbBindDouble(sqlite3_stmt *stmt, int index, double value)
+{
     int rc = sqlite3_bind_double(stmt, index, value);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         fprintf(stderr, "Failed to bind double: %s\n", sqlite3_errmsg(sqlite3_db_handle(stmt)));
+        exit(1);
     }
     return rc;
 }
 
-int dbStep(sqlite3_stmt *stmt) {
+int dbStep(sqlite3_stmt *stmt)
+{
     int rc = sqlite3_step(stmt);
-    if (rc != SQLITE_ROW && rc != SQLITE_DONE) {
+    if (rc != SQLITE_ROW && rc != SQLITE_DONE)
+    {
         fprintf(stderr, "Execution failed: %s\n", sqlite3_errmsg(sqlite3_db_handle(stmt)));
-        return rc; 
+        exit(1);
+        return rc;
     }
-    return rc; 
+    return rc;
 }
 
-
-int getColumnInt(sqlite3_stmt *stmt, int col) {
-    if (sqlite3_column_type(stmt, col) == SQLITE_NULL) {
-        return 0; 
+int getColumnInt(sqlite3_stmt *stmt, int col)
+{
+    if (sqlite3_column_type(stmt, col) == SQLITE_NULL)
+    {
+        return 0;
     }
     return sqlite3_column_int(stmt, col);
 }
 
-const char* getColumnText(sqlite3_stmt *stmt, int col) {
-    if (sqlite3_column_type(stmt, col) == SQLITE_NULL) {
+const char *getColumnText(sqlite3_stmt *stmt, int col)
+{
+    if (sqlite3_column_type(stmt, col) == SQLITE_NULL)
+    {
         return NULL;
     }
-    return (const char*)sqlite3_column_text(stmt, col);
+    return (const char *)sqlite3_column_text(stmt, col);
 }
 
-double getColumnDouble(sqlite3_stmt *stmt, int col) {
-    if (sqlite3_column_type(stmt, col) == SQLITE_NULL) {
+double getColumnDouble(sqlite3_stmt *stmt, int col)
+{
+    if (sqlite3_column_type(stmt, col) == SQLITE_NULL)
+    {
         return 0.0; // Or handle NULL as appropriate
     }
     return sqlite3_column_double(stmt, col);
 }
 
-int isColumnNull(sqlite3_stmt *stmt, int col) {
+int isColumnNull(sqlite3_stmt *stmt, int col)
+{
     return sqlite3_column_type(stmt, col) == SQLITE_NULL;
+}
+
+int dbFinalize(sqlite3_stmt *stmt) {
+    return sqlite3_finalize(stmt);
 }

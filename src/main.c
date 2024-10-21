@@ -18,6 +18,7 @@ unknownAcc:
     printf("\n\t\t[8]- Exit\n");
     getPrompt(&input);
     option = atoi(input);
+    free(input);
     switch (option)
     {
     case 1:
@@ -78,7 +79,6 @@ unknownAcc:
         dbClose(db);
         exit(1);
     default:
-        free(input);
         printf("Invalid operation!\n");
         fflush(stdout);
         goto unknownAcc;
@@ -99,15 +99,14 @@ notFound:
 
     getPrompt(&input);
     option = atoi(input);
+    free(input);
     switch (option)
     {
     case 1:
         loginMenu(&u);
-        if (!checkAuth(*u))
-        {
-            free(input);
-            return;
-        }
+        if (checkAuth(*u))
+            return; // done succefully
+        freeUser(u);
         printf("\nWrong password!! or User Name\n");
         fflush(stdout);
         sleep(1);
@@ -115,21 +114,17 @@ notFound:
     case 2:
         registerMenu(&u);
         if (!insertUser(*u))
-        {
-            free(input);
             return;
-        }
+        freeUser(u);
         printf("\nUser already exists!\n");
         fflush(stdout);
         sleep(1);
         goto notFound;
     case 3:
-        free(input);
         sqlite3_close(db);
         exit(1);
         goto notFound;
     default:
-        free(input);
         printf("Insert a valid operation!\n");
         fflush(stdout);
         sleep(1);
@@ -145,6 +140,5 @@ int main()
     initDatabase();
     initMenu(&u);
     mainMenu(u);
-    sqlite3_close(db);
     return 0;
 }

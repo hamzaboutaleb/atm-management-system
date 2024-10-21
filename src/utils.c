@@ -2,7 +2,7 @@
 
 void getPrompt(char **str)
 {
-    *str =  NULL;
+    *str = NULL;
     size_t size = 0;
     ssize_t chars_read;
 
@@ -31,7 +31,7 @@ static int countWord(char *str, char delim)
     count = 0;
     while (str[i])
     {
-        if (str[i] == delim || !str[i+1])
+        if (str[i] == delim || !str[i + 1])
             count++;
         i++;
     }
@@ -49,7 +49,7 @@ static void fillStr(char *toFill, char *filler, char delim, int index)
     int i;
 
     i = 0;
-    while(filler[index] && filler[index] != delim)
+    while (filler[index] && filler[index] != delim)
     {
         toFill[i] = filler[index];
         index++;
@@ -74,9 +74,9 @@ char **split(char *str, char delim)
     {
         delim_index = countChar(str, i, delim);
         result[j] = malloc(delim_index + 1);
-        memset(result[j], '\0', delim_index +1);
+        memset(result[j], '\0', delim_index + 1);
         fillStr(result[j++], str, delim, i);
-        i = delim_index+1;
+        i = delim_index + 1;
     }
     return result;
 }
@@ -93,7 +93,8 @@ int countArr(char **arr)
     int i;
 
     i = -1;
-    while(arr[++i] != NULL);
+    while (arr[++i] != NULL)
+        ;
     return i;
 }
 
@@ -186,7 +187,7 @@ int strIsInt(char *str)
     i = 0;
     if (!strlen(str))
         return 0;
-    while(str[i])
+    while (str[i])
     {
         if (!isdigit(str[i]))
             return 0;
@@ -202,16 +203,17 @@ int checkExistingAcc(int id)
 
     const char *query = "SELECT COUNT(*) FROM records WHERE account_id = ?";
 
-    if (dbQuery(db, query, &stmt) == SQLITE_OK) {
+    if (dbQuery(db, query, &stmt) == SQLITE_OK)
+    {
         dbBindInt(stmt, 1, id);
-        if (dbStep(stmt) == SQLITE_ROW) {
+        if (dbStep(stmt) == SQLITE_ROW)
+        {
             exists = getColumnInt(stmt, 0);
         }
         sqlite3_finalize(stmt);
     }
     return exists > 0 ? 1 : 0;
 }
-
 
 void success(struct User u)
 {
@@ -242,19 +244,29 @@ invalid:
     }
 }
 
-int validate_date(const char *date) {
+int validate_date(const char *date)
+{
     regex_t regex;
     int ret;
 
     const char *pattern = "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/([0-9]{4})$";
     ret = regcomp(&regex, pattern, REG_EXTENDED);
-    if (ret) {
+    if (ret)
+    {
         fprintf(stderr, "Could not compile regex\n");
         return 0;
     }
 
     ret = regexec(&regex, date, 0, NULL, 0);
-    regfree(&regex); 
+    regfree(&regex);
     printf("%d", ret);
-    return (ret == 0); 
+    return (ret == 0);
+}
+
+void freeUser(struct User *u)
+{
+    if (u->name)
+        free(u->name);
+    if (u->password)
+        free(u->password);
 }

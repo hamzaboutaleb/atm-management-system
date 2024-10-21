@@ -32,10 +32,10 @@ void loginMenu(struct User **u)
 int checkAuth(struct User u)
 {
     char *sql;
-    int rc;
+    int rc, exists = 0;
     sqlite3_stmt *stmt;
 
-    sql = "SELECT 1 FROM users WHERE name = ? AND pass = ?";
+    sql = "SELECT COUNT(*) FROM users WHERE name = ? AND pass = ?";
     if (dbQuery(db, sql, &stmt) != SQLITE_OK)
     {
         fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(db));
@@ -45,15 +45,7 @@ int checkAuth(struct User u)
     dbBindText(stmt, 1, u.name);
     dbBindText(stmt, 2, u.password);
     if (dbStep(stmt) == SQLITE_ROW)
-    {
-        sqlite3_finalize(stmt);
-        return 0;
-    }
-    else
-    {
-        fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
-        sqlite3_finalize(stmt);
-        sqlite3_close(db);
-        exit(1);
-    }
+        exists = getColumnInt(stmt, 0) > 0 ? 1 : 0;
+    sqlite3_finalize(stmt);
+    return exists;
 }

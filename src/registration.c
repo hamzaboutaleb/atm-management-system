@@ -34,19 +34,33 @@ int insertUser(struct User u)
     char *sql;
     int rc;
     sqlite3_stmt *stmt;
-
+    if (userNameExist(u.name))
+        return 1;
     sql = "INSERT INTO users (name, pass) VALUES (?, ?)";
-    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_text(stmt, 1, u.name, -1, SQLITE_STATIC);
-    handleStatementError(rc, db, sqlite3_errmsg(db), stmt);
-    rc = sqlite3_bind_text(stmt, 2, u.password, -1, SQLITE_STATIC);
-    handleStatementError(rc, db, sqlite3_errmsg(db), stmt);
-    rc = sqlite3_step(stmt);
+    dbQuery(db, sql, &stmt);
+    dbBindText(stmt, 1, u.name);
+    dbBindText(stmt, 2, u.password);
+
+    rc = dbStep(stmt);
     if (rc == SQLITE_CONSTRAINT)
         return 1;
-    else if (rc != SQLITE_DONE)
-        handleStatementError(rc, db, sqlite3_errmsg(db), stmt);
-    sqlite3_finalize(stmt);
+
+    dbFinalize(stmt);
     return 0;
+}
+
+int userNameExist(char *username)
+{
+    char *sql;
+    int rc, exists = 0;
+    sqlite3_stmt *stmt;
+
+    sql = "SELECT COUNT(*) FROM users WHERE name = ?";
+    dbQuery(db, sql, &stmt);
+    dbBindText(stmt, 1, username);
+    if (dbStep(stmt) == SQLITE_ROW)
+        exists = getColumnInt(stmt, 0) > 0 ? 1 : 0;
+    rc = sqlite3_finalize(stmt);
+    printf("%d\n", rc);
+    return exists;
 }
