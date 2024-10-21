@@ -14,7 +14,7 @@ int updateAccount(struct User u, char *input)
         sleep(1);
         return 1;
     }
-    if (checkExistingAccByUser(u.name, acc_id))
+    if (!checkExistingAccByUser(u.name, acc_id))
     {
         printf("\n\nUnknown account!!");
         fflush(stdout);
@@ -28,44 +28,40 @@ int updateAccount(struct User u, char *input)
     free(input);
     if (option == 1)
     {
-invalidPhonenumber:
+    invalidPhonenumber:
         system("clear");
         printf("Enter the new phone number: ");
         getPrompt(&input);
-        if (strIsInt(input))
+        if (!strIsInt(input))
         {
+            free(input);
             printf("\n\nInvalid phone number!!\n\n");
             fflush(stdout);
             sleep(1);
             goto invalidPhonenumber;
         }
         sql = "UPDATE records SET phone_number = ? WHERE user_name = ? AND account_id = ?";
-    } else if (option == 2)
+    }
+    else if (option == 2)
     {
         system("clear");
         printf("Enter the new country: ");
         getPrompt(&input);
         sql = "UPDATE records SET country = ? WHERE user_name = ? AND account_id = ?";
-    } else
+    }
+    else
     {
         printf("\nInvalid operation!\n");
         fflush(stdout);
         sleep(1);
         return 1;
     }
-    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_text(stmt, 1, input, -1, SQLITE_STATIC);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_text(stmt, 2, u.name, -1, SQLITE_STATIC);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_int(stmt, 3, acc_id);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_step(stmt);
-    if (rc == SQLITE_DONE)
+    dbQuery(db, sql, &stmt);
+    dbBindText(stmt, 1, input);
+    dbBindText(stmt, 2, u.name);
+    dbBindInt(stmt, 3, acc_id);
+    if (dbStep(stmt) == SQLITE_DONE)
         return 0;
-    else
-        handleStatementError(rc, db, sqlite3_errmsg(db), stmt);
-    sqlite3_finalize(stmt);
+    dbFinalize(stmt);
     return 1;
 }

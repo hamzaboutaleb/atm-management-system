@@ -126,24 +126,19 @@ void handleStatementError(int rc, sqlite3 *db, const char *errmsg, sqlite3_stmt 
 int checkExistingAccByUser(char *user, int id)
 {
     char *sql;
-    int rc;
+    int rc, exist = false;
     sqlite3_stmt *stmt;
 
     sql = "SELECT COUNT(*) FROM records WHERE user_name = ? AND account_id = ?";
     dbQuery(db, sql, &stmt);
-    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_text(stmt, 1, user, -1, SQLITE_STATIC);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_int(stmt, 2, id);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_step(stmt);
+    dbBindText(stmt, 1, user);
+    dbBindInt(stmt, 2, id);
+    rc = dbStep(stmt);
     if (rc == SQLITE_ROW)
-        return 0;
-    else if (rc == SQLITE_DONE)
-        return 1;
-    handleStatementError(rc, db, sqlite3_errmsg(db), stmt);
-    return 1;
+    {
+        exist = getColumnInt(stmt, 0) > 0 ? true : false;
+    }
+    return exist;
 }
 
 int checkAmount(char *str)

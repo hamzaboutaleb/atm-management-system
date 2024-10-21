@@ -127,7 +127,7 @@ invalidType:
     }
     record.accountType = input;
     insertRecord(record, u);
-    freeRecord(&record);
+    // freeRecord(&record);
     printf("\n✔ Success!\n\n");
     success(u);
 }

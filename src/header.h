@@ -9,6 +9,7 @@
 #include <termios.h>
 #include <ctype.h>
 #include <regex.h>
+#include <stdbool.h>
 
 struct Date
 {
