@@ -159,20 +159,18 @@ int checkExistingUser(char *user, int *user_id)
     sqlite3_stmt *stmt;
 
     sql = "SELECT id FROM users WHERE name = ?;";
-    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_text(stmt, 1, user, -1, SQLITE_STATIC);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_step(stmt);
+    dbQuery(db, sql, &stmt);
+    dbBindText(stmt, 1, user);
+    rc = dbStep(stmt);
     if (rc == SQLITE_ROW)
     {
-        *user_id = sqlite3_column_int(stmt, 0);
-        return 0;
+        *user_id = getColumnInt(stmt, 0);
+        dbFinalize(stmt);
+        return true;
     }
     else if (rc == SQLITE_DONE)
-        return 1;
-    handleStatementError(rc, db, sqlite3_errmsg(db), stmt);
-    return 1;
+        return false;
+    return false;
 }
 
 int strIsInt(char *str)

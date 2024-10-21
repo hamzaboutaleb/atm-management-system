@@ -71,7 +71,9 @@ unknownAcc:
         system("clear");
         printf("What is the account number you want to delete:");
         getPrompt(&input);
-        if (deleteAccount(u, input))
+        bool isDeleted = deleteAccount(u, input);
+        free(input);
+        if (!isDeleted)
             goto unknownAcc;
         printf("\n✔ Success!\n\n");
         success(u);
@@ -81,7 +83,9 @@ unknownAcc:
         system("clear");
         printf("Enter the account number you want to transfer ownership:");
         getPrompt(&input);
-        if (transfer(u, input))
+        bool isTransferd = transfer(u, input);
+        free(input);
+        if (!isTransferd)
             goto unknownAcc;
         printf("\n✔ Success!\n\n");
         success(u);

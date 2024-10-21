@@ -8,20 +8,15 @@ int deleteAccount(struct User u, char *input)
     sqlite3_stmt *stmt;
 
     if (checkAccount(u, input, 1))
-        return 1;
+        return false;
     acc_id = atoi(input);
     sql = "DELETE FROM records WHERE user_name = ? AND account_id = ?";
-    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_text(stmt, 1, u.name, -1, SQLITE_STATIC);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_bind_int(stmt, 2, acc_id);
-    handleDbError(rc, db, sqlite3_errmsg(db));
-    rc = sqlite3_step(stmt);
-    if (rc == SQLITE_DONE)
-        return 0;
-    else
-        handleStatementError(rc, db, sqlite3_errmsg(db), stmt);
-    sqlite3_finalize(stmt);
-    return 1;
+    dbQuery(db, sql, &stmt);
+    dbBindText(stmt, 1, u.name);
+    dbBindInt(stmt, 2, acc_id);
+    rc = dbStep(stmt);
+    if (dbStep(stmt) == SQLITE_DONE)
+        return true;
+    dbFinalize(stmt);
+    return false;
 }
