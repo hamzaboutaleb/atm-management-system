@@ -28,7 +28,11 @@ unknownAcc:
         printf("What is the account number you want to change:");
         getPrompt(&input);
         if (updateAccount(u, input))
+        {
+            free(input);
             goto unknownAcc;
+        }
+        free(input);
         system("clear");
         printf("\n✔ Success!\n\n");
         success(u);
@@ -76,6 +80,7 @@ unknownAcc:
         system("clear");
         goto unknownAcc;
     case 8:
+        freeUser(&u);
         dbClose(db);
         exit(1);
     default:

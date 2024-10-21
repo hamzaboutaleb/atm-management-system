@@ -91,4 +91,5 @@ int checkExistingUser(char *user, int *user_id);
 int strIsInt(char *str);
 int validate_date(const char *date);
 void freeUser(struct User *u);
+void freeRecord(struct Record *r);
 #endif

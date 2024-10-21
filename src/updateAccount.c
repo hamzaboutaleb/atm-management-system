@@ -4,7 +4,7 @@ int updateAccount(struct User u, char *input)
 {
     char *sql;
     int acc_id;
-    int rc;
+    int rc, option;
     sqlite3_stmt *stmt;
 
     if ((acc_id = atoi(input)) <= 0 && strcmp(input, "0") != 0)
@@ -24,7 +24,9 @@ int updateAccount(struct User u, char *input)
     system("clear");
     printf("Which information do you want to update?\n\n[1]- Phone number\n[2]- country\n-> ");
     getPrompt(&input);
-    if (strcmp(input, "1") == 0)
+    option = atoi(input);
+    free(input);
+    if (option == 1)
     {
 invalidPhonenumber:
         system("clear");
@@ -38,7 +40,7 @@ invalidPhonenumber:
             goto invalidPhonenumber;
         }
         sql = "UPDATE records SET phone_number = ? WHERE user_name = ? AND account_id = ?";
-    } else if (strcmp(input, "2") == 0)
+    } else if (option == 2)
     {
         system("clear");
         printf("Enter the new country: ");

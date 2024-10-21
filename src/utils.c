@@ -210,7 +210,7 @@ int checkExistingAcc(int id)
         {
             exists = getColumnInt(stmt, 0);
         }
-        sqlite3_finalize(stmt);
+        dbFinalize(stmt);
     }
     return exists > 0 ? 1 : 0;
 }
@@ -225,14 +225,18 @@ invalid:
     printf("\n\nEnter 1 to go to the main menu and 0 to exit!\n");
     getPrompt(&input);
     option = atoi(input);
-    if ((option = atoi(input)) <= 0 && strcmp(input, "0") != 0)
+    if (option <= 0 && strcmp(input, "0") != 0)
+    {
         option = 2;
+    }
+    free(input);
     switch (option)
     {
     case 1:
         mainMenu(u);
         break;
     case 0:
+        freeUser(&u);
         sqlite3_close(db);
         exit(0);
     default:
@@ -259,7 +263,6 @@ int validate_date(const char *date)
 
     ret = regexec(&regex, date, 0, NULL, 0);
     regfree(&regex);
-    printf("%d", ret);
     return (ret == 0);
 }
 
@@ -269,4 +272,18 @@ void freeUser(struct User *u)
         free(u->name);
     if (u->password)
         free(u->password);
+}
+
+void freeRecord(struct Record *r)
+{
+    if (r->accountType)
+        free(r->accountType);
+    if (r->country)
+        free(r->country);
+    if (r->deposit)
+        free(r->deposit);
+    if (r->name)
+        free(r->name);
+    if (r->phone)
+        free(r->phone);
 }
