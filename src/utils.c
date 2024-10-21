@@ -298,3 +298,17 @@ bool isFixedAccount(int id)
     }
     return false;
 }
+
+void getTodayDate(struct Date *d, char **buffer)
+{
+    time_t now;
+    struct tm *local;
+    *buffer = malloc(sizeof(char) * 20);
+
+    time(&now);
+    local = localtime(&now);
+    d->day = local->tm_mday;
+    d->year = local->tm_year + 1900;
+    d->month = local->tm_mon + 1;
+    strftime(*buffer, 20, "%m/%d/%Y", local);
+}

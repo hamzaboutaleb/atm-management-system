@@ -51,19 +51,8 @@ void createNewAcc(struct User u)
 invalidDate:
     system("clear");
     printf("\t\t\t===== New record =====\n");
-    printf("\nEnter today's date(mm/dd/yyyy):");
-    getPrompt(&input);
-    if (!validate_date(input))
-    {
-        free(input);
-        printf("\n\nInvalid date!!\n\n");
-        sleep(1);
-        goto invalidDate;
-    }
-    strs = split(input, '/');
-    getDateFromStrs(strs, &date);
-    free_split(strs);
-    record.deposit = input;
+    getTodayDate(&date, &record.deposit);
+    printf("%d-%d-%d\n %s", date.day, date.month, date.year, record.deposit);
 invalidAccountnumber:
     printf("\nEnter the account number:");
     getPrompt(&input);
@@ -92,7 +81,7 @@ invalidPhonenumber:
     getPrompt(&record.phone);
     if (!strIsInt(record.phone))
     {
-        free(&record.phone);
+        free(record.phone);
         printf("\n\nInvalid phone number!!\n\n");
         fflush(stdout);
         sleep(1);

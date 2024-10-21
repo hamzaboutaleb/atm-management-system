@@ -11,7 +11,7 @@ FLAGS = -lsqlite3
 all : $(NAME)
 
 $(NAME) : $(OBJECT)
-	cc -o $(NAME) -fsanitize=address  $(OBJECT) $(FLAGS)
+	cc -o $(NAME)  $(OBJECT) $(FLAGS)
 	clear
 
 src/%.o: src/%.c $(HEADER)

@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <regex.h>
 #include <stdbool.h>
+#include <time.h>
 
 struct Date
 {
@@ -94,4 +95,5 @@ int validate_date(const char *date);
 void freeUser(struct User *u);
 void freeRecord(struct Record *r);
 bool isFixedAccount(int id);
+void getTodayDate(struct Date *d, char **store);
 #endif

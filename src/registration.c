@@ -61,6 +61,5 @@ int userNameExist(char *username)
     if (dbStep(stmt) == SQLITE_ROW)
         exists = getColumnInt(stmt, 0) > 0 ? 1 : 0;
     rc = sqlite3_finalize(stmt);
-    printf("%d\n", rc);
     return exists;
 }
